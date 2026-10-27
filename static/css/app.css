@@ -1,0 +1,74 @@
+/* ===== 上机考试管理系统 - 自定义样式 ===== */
+
+body {
+    background-color: #f5f7fa;
+}
+
+main.container {
+    padding-top: 1rem;
+    padding-bottom: 2rem;
+    min-height: calc(100vh - 160px);
+}
+
+/* 表格截断 */
+.table td,
+.table th {
+    vertical-align: middle;
+}
+
+.table td.text-truncate,
+.table th.text-truncate {
+    max-width: 200px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* 徽章在紧凑表头中的尺寸 */
+.badge {
+    font-weight: 500;
+}
+
+/* 卡片悬浮阴影 */
+.card {
+    border-radius: 0.5rem;
+}
+
+/* 子导航胶囊 */
+.nav-pills .nav-link {
+    color: #495057;
+}
+
+.nav-pills .nav-link.active {
+    font-weight: 600;
+}
+
+/* 滚动区域美化 */
+.sticky-top {
+    background: #fff;
+    z-index: 10;
+}
+
+/* 通知区域淡入淡出 */
+#notify-area {
+    transition: opacity 0.3s ease;
+}
+
+/* 数字大号展示 */
+.display-6 {
+    font-size: 2.25rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+    main.container {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+
+    .display-6 {
+        font-size: 1.75rem;
+    }
+}
