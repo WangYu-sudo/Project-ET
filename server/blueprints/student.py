@@ -2,11 +2,6 @@
 学生功能蓝图
 考试主页、下载试卷、上传答案、查看已提交、接收通知（AJAX 接口）
 """
-# -*- coding: utf-8 -*-
-"""
-学生功能蓝图
-考试主页、下载试卷、上传答案、查看已提交、接收通知（AJAX 接口）
-"""
 from flask import Blueprint, request, session as flask_session
 
 from ..decorators import student_required
