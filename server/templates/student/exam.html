@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}在线考试 - {{ exam.name }}{% endblock %}
+
+{% block content %}
+<!-- 通知条 -->
+<div id="notify-area" class="alert alert-info d-none alert-dismissible fade show" role="alert">
+    <i class="bi bi-megaphone-fill"></i>
+    <span id="notify-content"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+
+<!-- 考试基本信息 -->
+<div class="card shadow-sm mb-3">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-mortarboard"></i> {{ exam.name }}</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-2 small text-muted mb-2">
+            <div>学号：<strong class="text-dark">{{ student.number }}</strong></div>
+            <div>姓名：<strong class="text-dark">{{ student.name }}</strong></div>
+            {% if student.clazz %}
+            <div>班级：<strong class="text-dark">{{ student.clazz }}</strong></div>
+            {% endif %}
+        </div>
+
+        <!-- 下载试卷 -->
+        <a class="btn btn-primary" href="{{ url_for('student.exam_paper') }}">
+            <i class="bi bi-download"></i> 下载试卷
+        </a>
+    </div>
+</div>
+
+<!-- 上传答案 -->
+<div class="card shadow-sm mb-3">
+    <div class="card-header">
+        <h6 class="mb-0"><i class="bi bi-upload"></i> 上传答案（可多次上传，同名自动覆盖）</h6>
+    </div>
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data"
+              action="{{ url_for('student.exam_submit') }}">
+            <div class="mb-3">
+                <input type="file" name="files" multiple class="form-control" required>
+                <small class="form-text text-muted">支持多选文件同时上传。</small>
+            </div>
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-send-check"></i> 提交
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- 已提交文件 -->
+<div class="card shadow-sm mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h6 class="mb-0"><i class="bi bi-file-earmark-check"></i> 已提交文件</h6>
+        <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('student.exam_submitted') }}">
+            查看全部
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <ul class="list-group list-group-flush">
+            {% for s in submits %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span class="text-truncate me-3">
+                    <i class="bi bi-file-earmark"></i> {{ s.filename }}
+                    <small class="text-muted ms-2">{{ s.submit_time.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+                </span>
+                <a class="btn btn-sm btn-outline-primary"
+                   href="{{ url_for('student.exam_submitted_download', sid=s.id) }}">
+                    <i class="bi bi-download"></i> 下载
+                </a>
+            </li>
+            {% else %}
+            <li class="list-group-item text-muted text-center">暂无提交</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    var notifyArea = $('#notify-area');
+    var notifyContent = $('#notify-content');
+    var lastId = 0;
+
+    // 页面初次加载，如果后端已传入一条通知则显示
+    {% if latest_notification %}
+        lastId = {{ latest_notification.id }};
+        notifyContent.text('{{ latest_notification.content | e }}');
+        notifyArea.removeClass('d-none');
+    {% endif %}
+
+    function poll() {
+        $.ajax({
+            url: '{{ url_for("student.latest_notification") }}',
+            type: 'GET',
+            data: { last_id: lastId },
+            dataType: 'json',
+            success: function (data) {
+                if (data && data.has_new) {
+                    notifyContent.text(data.content);
+                    notifyArea.removeClass('d-none');
+                    lastId = data.id;
+                }
+            },
+            error: function () { /* 忽略网络错误继续轮询 */ }
+        });
+    }
+
+    setInterval(poll, 5000);
+})();
+</script>
+{% endblock %}

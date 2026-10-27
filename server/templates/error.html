@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ code }} - 上机考试管理系统{% endblock %}
+{% block content %}
+<div class="text-center py-5">
+    <h1 class="display-1 text-muted">{{ code }}</h1>
+    <p class="lead">{{ msg }}</p>
+    <a href="{{ url_for('auth.index') }}" class="btn btn-primary mt-3">
+        <i class="bi bi-house"></i> 返回首页
+    </a>
+</div>
+{% endblock %}

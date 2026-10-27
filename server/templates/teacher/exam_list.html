@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}考试列表 - 教师台{% endblock %}
+
+{% block content %}
+<!-- 教师子导航 -->
+<nav class="nav nav-pills mb-3 bg-light p-2 rounded">
+    <a class="nav-link active" href="{{ url_for('teacher.exam_list') }}">
+        <i class="bi bi-journal-text"></i> 考试列表
+    </a>
+    <a class="nav-link disabled" href="#">当前考试</a>
+    <a class="nav-link" href="{{ url_for('auth.logout') }}">
+        <i class="bi bi-box-arrow-right"></i> 退出
+    </a>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <form method="get" class="d-flex">
+        <input class="form-control me-2" type="search" name="keyword"
+               placeholder="搜索考试名称" value="{{ keyword }}">
+        <button class="btn btn-outline-primary" type="submit">
+            <i class="bi bi-search"></i> 搜索
+        </button>
+    </form>
+    <a class="btn btn-success" href="{{ url_for('teacher.exam_create') }}">
+        <i class="bi bi-plus-circle-fill"></i> 新建考试
+    </a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>名称</th>
+                <th>状态</th>
+                <th>开始时间</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for e in pagination.items %}
+            <tr>
+                <td>{{ e.id }}</td>
+                <td class="text-truncate" style="max-width:200px;">{{ e.name }}</td>
+                <td>
+                    {% if e.cleaned %}
+                        <span class="badge bg-secondary">已清理</span>
+                    {% elif e.finished %}
+                        <span class="badge bg-success">已结束</span>
+                    {% elif e.started %}
+                        <span class="badge bg-primary">进行中</span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark">未开始</span>
+                    {% endif %}
+                </td>
+                <td>{{ e.start_time.strftime('%Y-%m-%d %H:%M') if e.start_time else '-' }}</td>
+                <td>
+                    <a class="btn btn-sm btn-outline-info"
+                       href="{{ url_for('teacher.exam_monitor', exam_id=e.id) }}">
+                        <i class="bi bi-speedometer2"></i> 监控
+                    </a>
+                    {% if not e.started %}
+                    <a class="btn btn-sm btn-outline-primary"
+                       href="{{ url_for('teacher.exam_edit', exam_id=e.id) }}">
+                        <i class="bi bi-pencil"></i> 编辑
+                    </a>
+                    {% endif %}
+                    {% if e.started and not e.finished %}
+                    <form class="d-inline" method="post"
+                          action="{{ url_for('teacher.exam_finish', exam_id=e.id) }}"
+                          data-confirm="确认结束考试「{{ e.name }}」？结束后不能再重新开启。">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-stop-fill"></i> 结束
+                        </button>
+                    </form>
+                    {% endif %}
+                    <form class="d-inline" method="post"
+                          action="{{ url_for('teacher.exam_clean', exam_id=e.id) }}"
+                          data-confirm="确认清理考试「{{ e.name }}」？所有数据将被删除。">
+                        <button type="submit" class="btn btn-sm btn-outline-dark"
+                                {% if not e.finished or e.cleaned %}disabled{% endif %}>
+                            <i class="bi bi-broom"></i> 清理
+                        </button>
+                    </form>
+                    <a class="btn btn-sm btn-outline-success"
+                       href="{{ url_for('teacher.exam_download', exam_id=e.id) }}">
+                        <i class="bi bi-download"></i> 打包
+                    </a>
+                    <a class="btn btn-sm btn-outline-secondary"
+                       href="{{ url_for('teacher.exam_export', exam_id=e.id) }}">
+                        <i class="bi bi-file-earmark-spreadsheet"></i> 导出
+                    </a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" class="text-center text-muted py-4">暂无考试，点击右上角新建</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- 分页 -->
+{% if pagination.pages > 1 %}
+<nav>
+    <ul class="pagination justify-content-center">
+        <li class="page-item {{ 'disabled' if not pagination.has_prev }}">
+            <a class="page-link"
+               href="{{ url_for('teacher.exam_list', page=pagination.prev_num, keyword=keyword) }}">
+                上一页
+            </a>
+        </li>
+        {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+            {% if p %}
+                <li class="page-item {{ 'active' if p == pagination.page }}">
+                    <a class="page-link"
+                       href="{{ url_for('teacher.exam_list', page=p, keyword=keyword) }}">{{ p }}</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">...</span></li>
+            {% endif %}
+        {% endfor %}
+        <li class="page-item {{ 'disabled' if not pagination.has_next }}">
+            <a class="page-link"
+               href="{{ url_for('teacher.exam_list', page=pagination.next_num, keyword=keyword) }}">
+                下一页
+            </a>
+        </li>
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

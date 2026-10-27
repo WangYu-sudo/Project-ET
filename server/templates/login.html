@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}登录 - 上机考试管理系统{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5 col-lg-4">
+        <div class="card shadow-sm mt-5">
+            <div class="card-header bg-white text-center py-3">
+                <h5 class="mb-0">
+                    {% if role == 'select' %}选择登录角色{% endif %}
+                    {% if role == 'admin' %}管理员登录{% endif %}
+                    {% if role == 'teacher' %}教师登录{% endif %}
+                    {% if role == 'student' %}学生登录{% endif %}
+                </h5>
+            </div>
+            <div class="card-body p-4">
+
+                {% if role == 'select' %}
+                <div class="d-grid gap-3">
+                    <a href="{{ url_for('auth.admin_login') }}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-shield-lock"></i> 管理员登录
+                    </a>
+                    <a href="{{ url_for('auth.teacher_login') }}" class="btn btn-success btn-lg">
+                        <i class="bi bi-person-badge"></i> 教师登录
+                    </a>
+                    <a href="{{ url_for('auth.student_login') }}" class="btn btn-info btn-lg">
+                        <i class="bi bi-mortarboard"></i> 学生登录
+                    </a>
+                </div>
+
+                {% elif role == 'admin' %}
+                <form method="post" action="{{ url_for('auth.admin_login') }}">
+                    <div class="mb-3">
+                        <label class="form-label">账号</label>
+                        <input type="text" name="username" class="form-control" required autofocus>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">密码</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">登录</button>
+                </form>
+                <div class="text-center mt-3 small text-muted">
+                    首次使用可尝试 <code>admin / admin</code>
+                </div>
+
+                {% elif role == 'teacher' %}
+                <form method="post" action="{{ url_for('auth.teacher_login') }}">
+                    <div class="mb-3">
+                        <label class="form-label">教师账号</label>
+                        <input type="text" name="username" class="form-control" required autofocus>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">密码</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">登录</button>
+                </form>
+
+                {% elif role == 'student' %}
+                <form method="post" action="{{ url_for('auth.student_login') }}">
+                    <div class="mb-3">
+                        <label class="form-label">学号</label>
+                        <input type="text" name="number" class="form-control" required autofocus>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">姓名</label>
+                        <input type="text" name="name" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-info w-100">登录考试</button>
+                </form>
+                <div class="text-center mt-3 small text-muted">
+                    请确保已开启考试，系统将自动绑定您的电脑
+                </div>
+                {% endif %}
+
+                {% if role != 'select' %}
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('auth.index') }}" class="text-decoration-none">
+                        <i class="bi bi-arrow-left"></i> 返回角色选择
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

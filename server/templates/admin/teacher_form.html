@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ '编辑教师' if teacher else '新增教师' }} - 管理员后台{% endblock %}
+
+{% block content %}
+<!-- 管理员子导航 -->
+<nav class="nav nav-pills mb-3 bg-light p-2 rounded">
+    <a class="nav-link" href="{{ url_for('admin.teacher_list') }}">
+        <i class="bi bi-people-fill"></i> 教师管理
+    </a>
+    <a class="nav-link" href="{{ url_for('admin.exam_list') }}">
+        <i class="bi bi-journal-text"></i> 考试管理
+    </a>
+    <a class="nav-link" href="{{ url_for('admin.system_config') }}">
+        <i class="bi bi-gear-fill"></i> 系统配置
+    </a>
+</nav>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-person-plus-fill"></i>
+                    {{ '编辑教师' if teacher else '新增教师' }}
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post"
+                      action="{% if teacher %}{{ url_for('admin.teacher_edit', uid=teacher.id) }}{% else %}{{ url_for('admin.teacher_create') }}{% endif %}">
+
+                    {% if not teacher %}
+                    <div class="mb-3">
+                        <label class="form-label">账号 <span class="text-danger">*</span></label>
+                        <input type="text" name="username" class="form-control"
+                               required autofocus>
+                    </div>
+                    {% else %}
+                    <div class="mb-3">
+                        <label class="form-label">账号</label>
+                        <input type="text" class="form-control"
+                               value="{{ teacher.username }}" disabled>
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label class="form-label">姓名</label>
+                        <input type="text" name="fullname" class="form-control"
+                               value="{{ teacher.fullname if teacher else '' }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            密码
+                            {% if teacher %}
+                                <span class="text-muted small">（留空表示不改）</span>
+                            {% else %}
+                                <span class="text-danger">*</span>
+                            {% endif %}
+                        </label>
+                        <input type="password" name="password" class="form-control"
+                               {% if not teacher %}required{% endif %}>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" name="make_admin" class="form-check-input"
+                               id="make_admin"
+                               {% if teacher and teacher.is_admin %}checked{% endif %}>
+                        <label class="form-check-label" for="make_admin">
+                            同时设为管理员
+                        </label>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg"></i> 保存
+                        </button>
+                        <a class="btn btn-outline-secondary"
+                           href="{{ url_for('admin.teacher_list') }}">
+                            取消
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
